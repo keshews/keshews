@@ -1,0 +1,30 @@
+BasedOnStyle: LLVM
+
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+
+BreakBeforeBraces: Attach
+
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+ColumnLimit: 120
+
+IndentCaseLabels: true
+AccessModifierOffset: -2
+
+SpaceBeforeAssignmentOperators: true
+SpaceAfterCStyleCast: false
+
+BinPackArguments: true
+BinPackParameters: BinPack
+
+BreakBeforeBinaryOperators: None

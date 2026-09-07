@@ -49,3 +49,5 @@ install_manifest.txt
 
 # Windows
 Thumbs.db
+.direnv
+prog.txt

@@ -120,10 +120,10 @@ private:
 
           // delimiters
         case '(':
-          add_token(tokenType::LEFT_PARANTHESES);
+          add_token(tokenType::LEFT_PARENTHESES);
           break;
         case ')':
-          add_token(tokenType::RIGHT_PARANTHESES);
+          add_token(tokenType::RIGHT_PARENTHESES);
           break;
         case '[':
           add_token(tokenType::LEFT_SQUARE_BRACKETS);

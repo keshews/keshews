@@ -190,11 +190,11 @@ private:
       advance_token();
     }
 
-    else if (current_token().tok_type == tokenType::LEFT_PARANTHESES) {
+    else if (current_token().tok_type == tokenType::LEFT_PARENTHESES) {
       advance_token();
-      auto lhs = parseExpression(0);
-      if (current_token().tok_type != tokenType::RIGHT_PARANTHESES) {
-        printError(current_token(), tokenType::RIGHT_PARANTHESES);
+      lhs = parseExpression(0);
+      if (current_token().tok_type != tokenType::RIGHT_PARENTHESES) {
+        printError(current_token(), tokenType::RIGHT_PARENTHESES);
         throw std::runtime_error("expected ')'");
       }
       advance_token();
@@ -245,7 +245,7 @@ private:
   }
 
   std::unique_ptr<ast::for_statement> parseForStatement() {
-    if (current_token().tok_type != tokenType::LEFT_PARANTHESES) {
+    if (current_token().tok_type != tokenType::LEFT_PARENTHESES) {
       printError(current_token(), "LEFT_PARANTHESES");
     }
 
@@ -278,8 +278,8 @@ private:
       printError(current_token(), "SEMI_COLON");
     }
 
-    if (current_token().tok_type != tokenType::RIGHT_PARANTHESES) {
-      printError(current_token(), tokenType::RIGHT_PARANTHESES);
+    if (current_token().tok_type != tokenType::RIGHT_PARENTHESES) {
+      printError(current_token(), tokenType::RIGHT_PARENTHESES);
     }
 
     advance_token();

@@ -288,6 +288,7 @@ private:
   }
 
   std::unique_ptr<ast::while_statement> parseWhileLoop() {
+    advance_token();
     std::unique_ptr<ast::expr> condition = parseExpression();
     std::unique_ptr<ast::container> body = ast::createContainerNode(parseBlock());
     return ast::createWhileStatementNode(std::move(condition), std::move(body));

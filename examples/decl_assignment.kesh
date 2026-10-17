@@ -1,0 +1,7 @@
+int a = 10
+double b = 10.0
+string c = "helloworld"
+
+a = b - c
+a += b
+a = b - q

@@ -2,7 +2,6 @@
 #include "ast.hpp"
 #include "lexer.hpp"
 #include <cstddef>
-#include <cstdio>
 #include <format>
 #include <variant>
 

@@ -1,5 +1,7 @@
 #include "lexer.cpp"
 #include "parser.cpp"
+#include "semantic_analyzer.hpp"
+#include "tac.hpp"
 #include <fstream>
 #include <sstream>
 
@@ -17,13 +19,19 @@ int main(int argc, char* argv[]) {
 
   std::stringstream buffer;
   buffer << file.rdbuf();
-  std::string input = buffer.str();
 
-  // 4. Run the lexer and parser
-  Lexer lex = Lexer(input);
-  auto tokens = lex.get_tokens();
-  Parser parser = Parser(tokens);
-  parser.parse();
+  try {
+    Lexer lex(buffer.str());
+    Parser parser(lex.get_tokens());
+    auto program = parser.parse();
 
+    Semantic_Analyzer analyzer;
+    analyzer.analyze(*program);
+
+    std::cout << generateTAC(*program);
+  } catch (const std::exception& e) {
+    std::cerr << e.what() << "\n";
+    return 1;
+  }
   return 0;
 }

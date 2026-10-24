@@ -6,9 +6,9 @@ int q = 10
 int r = 9 - q
 
 if (a>b) {
-    b = a + b
+    print(b)
 } elif (c==d) {
-    c = c + d
+    print(c)
 } else {
-    q = r
+    print(q)
 }

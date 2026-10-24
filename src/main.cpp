@@ -2,6 +2,7 @@
 #include "parser.cpp"
 #include "semantic_analyzer.hpp"
 #include "tac.hpp"
+#include "diagnostic.hpp"
 #include <fstream>
 #include <sstream>
 
@@ -19,9 +20,10 @@ int main(int argc, char* argv[]) {
 
   std::stringstream buffer;
   buffer << file.rdbuf();
+  std::string sourceCode = buffer.str();
 
   try {
-    Lexer lex(buffer.str());
+    Lexer lex(sourceCode);
     Parser parser(lex.get_tokens());
     auto program = parser.parse();
 
@@ -29,6 +31,9 @@ int main(int argc, char* argv[]) {
     analyzer.analyze(*program);
 
     std::cout << generateTAC(*program);
+  } catch (const CompileError& e) {
+    Diagnostic::print(sourceCode, argv[1], e);
+    return 1;
   } catch (const std::exception& e) {
     std::cerr << e.what() << "\n";
     return 1;

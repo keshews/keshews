@@ -1,7 +1,4 @@
 #include "tac.hpp"
-
-
-
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
@@ -24,11 +21,8 @@ class CodeGen {
   llvm::Module mod{"my_lang", ctx};
   llvm::IRBuilder<> b{ctx};
 
-
   std::vector<std::unordered_map<std::string, llvm::AllocaInst *>> scopes;
   llvm::Function *mainFn = nullptr;
-
-
 
   [[noreturn]] void fail(const std::string &msg, int line = 0) {
     throw std::runtime_error("codegen error" + (line ? " (line " + std::to_string(line) + ")" : "") + ": " + msg);
@@ -46,7 +40,6 @@ class CodeGen {
     }
   }
 
-
   llvm::Value *toBool(llvm::Value *v) {
     llvm::Type *t = v->getType();
     if (t->isIntegerTy(1)) return v;
@@ -54,7 +47,6 @@ class CodeGen {
     if (t->isIntegerTy()) return b.CreateICmpNE(v, llvm::ConstantInt::get(t, 0), "tobool");
     fail("value cannot be used as a condition");
   }
-
 
   llvm::Value *coerce(llvm::Value *v, llvm::Type *to) {
     llvm::Type *from = v->getType();
@@ -72,7 +64,6 @@ class CodeGen {
     fail("cannot convert between these types");
   }
 
-
   void unify(llvm::Value *&l, llvm::Value *&r, int line) {
     auto isNum = [](llvm::Type *t) { return t->isIntegerTy() || t->isDoubleTy(); };
     if (!isNum(l->getType()) || !isNum(r->getType())) fail("operator needs numeric operands", line);
@@ -86,8 +77,6 @@ class CodeGen {
     }
   }
 
-
-
   void pushScope() { scopes.emplace_back(); }
   void popScope() { scopes.pop_back(); }
 
@@ -98,8 +87,6 @@ class CodeGen {
     }
     fail("undeclared variable '" + name + "'");
   }
-
-
 
   llvm::Value *gen(const ast::expr &e) {
     return std::visit([&](const auto &n) -> llvm::Value * { return genNode(n); }, e.val);
@@ -149,7 +136,7 @@ class CodeGen {
 
   llvm::Value *genNode(const ast::binary_expression &n) {
     const tokenType op = n.oper.tok_type;
-    const int line = n.oper.line;
+    const int line = n.oper.loc.line;
 
     if (op == tokenType::AND) return genLogical(n, true);
     if (op == tokenType::OR)  return genLogical(n, false);
@@ -184,8 +171,6 @@ class CodeGen {
       fail("unknown binary operator", line);
     }
   }
-
-
 
   void genDecl(const ast::declaration &d) {
     llvm::Type *ty = toLLVMType(d.type);

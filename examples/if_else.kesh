@@ -1,7 +1,14 @@
+int a = 10
+int b = 15
+int c = 0
+int d = 9
+int q = 10
+int r = 9 - q
+
 if (a>b) {
-    b = a - b
+    b = a + b
 } elif (c==d) {
-    c = c-d
+    c = c + d
 } else {
     q = r
 }

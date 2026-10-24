@@ -68,11 +68,13 @@ enum class tokenType {
   INT_VAL,
   DOUBLE_VAL,
   STRING_VAL,
+
+  PRINT
 };
 
 typedef struct {
-    int line;
-    int col;
+  int line;
+  int col;
 } sourceLocation;
 
 typedef struct {
@@ -94,14 +96,15 @@ private:
       {"if", tokenType::IF},         {"else", tokenType::ELSE},     {"elif", tokenType::ELIF},
       {"for", tokenType::FOR},       {"while", tokenType::WHILE},   {"int", tokenType::INT},
       {"double", tokenType::DOUBLE}, {"string", tokenType::STRING}, {"bool", tokenType::BOOL},
-      {"true", tokenType::TRUE},     {"false", tokenType::FALSE},   {"not", tokenType::NOT}};
+      {"true", tokenType::TRUE},     {"false", tokenType::FALSE},   {"not", tokenType::NOT},
+      {"print", tokenType::PRINT}};
 
   char peek();
   char current();
   char advance();
   bool is_eof();
   void add_token(tokenType tok_type);
-  void add_token(tokenType tok_type,int col);
+  void add_token(tokenType tok_type, int col);
   void add_token(tokenType tok_type, std::string lexeme, int col);
   void alpha_handler();
   void digit_handler();

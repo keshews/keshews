@@ -1,5 +1,6 @@
 #include "ast.hpp"
 #include "symbol_table.hpp"
+#include <memory>
 
 class Semantic_Analyzer {
 
@@ -14,6 +15,7 @@ class Semantic_Analyzer {
   void analyze(std::unique_ptr<ast::while_statement>& node);
   void analyze(ast::assignment& node);
   void analyze(ast::declaration& node);
+  void analyze(std::unique_ptr<ast::print_statement>& node);
 
 public:
   Semantic_Analyzer();

@@ -1,6 +1,7 @@
 #include "parser.hpp"
 #include "ast.hpp"
 #include "diagnostic.hpp"
+#include "lexer.hpp"
 #include <cstddef>
 #include <format>
 #include <memory>
@@ -37,15 +38,29 @@ ast::statements Parser::parseStatement() {
     return parseForStatement();
   } else if (current_token().tok_type == tokenType::WHILE) {
     return parseWhileLoop();
+  } else if (current_token().tok_type == tokenType::PRINT) {
+    return parsePrintStatement();
   } else {
     throw CompileError("Parser", current_token().loc,
                        std::format("invalid start of statement '{}'", current_token().value));
   }
 }
 
+std::unique_ptr<ast::print_statement> Parser::parsePrintStatement() {
+    advance_token();
+  if (current_token().tok_type != tokenType::LEFT_PARENTHESES)
+    throw CompileError("Parser", current_token().loc, "expected '(' after 'print'");
+  advance_token();
+  auto expression = parseExpression();
+  if (current_token().tok_type != tokenType::RIGHT_PARENTHESES)
+    throw CompileError("Parser", current_token().loc, "expected ')' after print expression");
+  advance_token();
+  return std::make_unique<ast::print_statement>(ast::print_statement{std::move(expression)});
+}
+
 bool Parser::isDataType(token tok) {
-  return tok.tok_type == tokenType::INT || tok.tok_type == tokenType::DOUBLE ||
-         tok.tok_type == tokenType::STRING || tok.tok_type == tokenType::BOOL;
+  return tok.tok_type == tokenType::INT || tok.tok_type == tokenType::DOUBLE || tok.tok_type == tokenType::STRING ||
+         tok.tok_type == tokenType::BOOL;
 }
 
 bool Parser::isCompoundAssignmentOperator(token tok) {
@@ -132,7 +147,7 @@ bool Parser::isOperator(token tok) {
 
 bool Parser::isLiteral(token tok) {
   return tok.tok_type == tokenType::INT_VAL || tok.tok_type == tokenType::DOUBLE_VAL ||
-         tok.tok_type == tokenType::STRING_VAL;
+         tok.tok_type == tokenType::STRING_VAL || tok.tok_type == tokenType::TRUE || tok.tok_type == tokenType::FALSE;
 }
 
 bool Parser::isIdentifier(token tok) {
@@ -149,6 +164,10 @@ std::unique_ptr<ast::expr> Parser::createOperandNode(token tok) {
       return ast::createExprNode(ast::createIntNode(tok.value));
     case tokenType::DOUBLE_VAL:
       return ast::createExprNode(ast::createDoubleNode(tok.value));
+    case tokenType::TRUE:
+      return ast::createExprNode(ast::createBoolNode(true));
+    case tokenType::FALSE:
+      return ast::createExprNode(ast::createBoolNode(false));
     default:
       throw CompileError("Parser", tok.loc,
                          std::format("expected operand (identifier or literal), got '{}'", tok.value));
@@ -164,8 +183,7 @@ std::unique_ptr<ast::expr> Parser::parseExpression(int threshold) {
     advance_token();
     lhs = parseExpression(0);
     if (current_token().tok_type != tokenType::RIGHT_PARENTHESES) {
-      throw CompileError("Parser", current_token().loc,
-                         std::format("expected ')', got '{}'", current_token().value));
+      throw CompileError("Parser", current_token().loc, std::format("expected ')', got '{}'", current_token().value));
     }
     advance_token();
   } else {
@@ -267,8 +285,7 @@ std::unique_ptr<ast::while_statement> Parser::parseWhileLoop() {
 std::vector<ast::statements> Parser::parseBlock() {
   std::vector<ast::statements> stmts;
   if (current_token().tok_type != tokenType::LEFT_CURLY_BRACES) {
-    throw CompileError("Parser", current_token().loc,
-                       std::format("expected '{{', got '{}'", current_token().value));
+    throw CompileError("Parser", current_token().loc, std::format("expected '{{', got '{}'", current_token().value));
   }
   advance_token();
   while (!is_eof() && current_token().tok_type != tokenType::RIGHT_CURLY_BRACES) {

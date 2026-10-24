@@ -5,31 +5,41 @@
 #include <cstddef>
 #include <format>
 #include <string>
+#include <type_traits>
 #include <variant>
 
 std::string returnTypeString(Type t) {
   switch (t) {
-    case Type::String:  return "string";
-    case Type::Boolean: return "boolean";
-    case Type::Double:  return "double";
-    case Type::Int:     return "int";
-    default:            return "unknown_type";
+    case Type::String:
+      return "string";
+    case Type::Boolean:
+      return "boolean";
+    case Type::Double:
+      return "double";
+    case Type::Int:
+      return "int";
+    default:
+      return "unknown_type";
   }
 }
 
 std::string returnTokenTypeString(tokenType t) {
   switch (t) {
-    case tokenType::DOUBLE: return "double";
-    case tokenType::INT:    return "int";
-    case tokenType::STRING: return "string";
-    case tokenType::BOOL:   return "boolean";
-    default:                return "unknown_type";
+    case tokenType::DOUBLE:
+      return "double";
+    case tokenType::INT:
+      return "int";
+    case tokenType::STRING:
+      return "string";
+    case tokenType::BOOL:
+      return "boolean";
+    default:
+      return "unknown_type";
   }
 }
 
 bool doesTypeMatch(tokenType Ttype, Type type) {
-  return ((Ttype == tokenType::INT && type == Type::Int) ||
-          (Ttype == tokenType::STRING && type == Type::String) ||
+  return ((Ttype == tokenType::INT && type == Type::Int) || (Ttype == tokenType::STRING && type == Type::String) ||
           (Ttype == tokenType::DOUBLE && (type == Type::Double || type == Type::Int)) ||
           (Ttype == tokenType::BOOL && type == Type::Boolean));
 }
@@ -47,9 +57,8 @@ void Semantic_Analyzer::analyze(ast::container& node) {
 void Semantic_Analyzer::analyze(std::unique_ptr<ast::if_statement>& node) {
   Type condType = analyze(node->condition);
   if (condType != Type::Boolean) {
-    throw CompileError("Semantic",
-                       std::format("condition in 'if' statement must be a boolean, got '{}'",
-                                   returnTypeString(condType)));
+    throw CompileError(
+        "Semantic", std::format("condition in 'if' statement must be a boolean, got '{}'", returnTypeString(condType)));
   }
 
   table.enterScope();
@@ -86,8 +95,7 @@ void Semantic_Analyzer::analyze(std::unique_ptr<ast::for_statement>& node) {
   Type condType = analyze(node->condition);
   if (condType != Type::Boolean) {
     throw CompileError("Semantic",
-                       std::format("condition in 'for' loop must be a boolean, got '{}'",
-                                   returnTypeString(condType)));
+                       std::format("condition in 'for' loop must be a boolean, got '{}'", returnTypeString(condType)));
   }
 
   analyze(node->increment);
@@ -95,12 +103,15 @@ void Semantic_Analyzer::analyze(std::unique_ptr<ast::for_statement>& node) {
   table.exitScope();
 }
 
+void Semantic_Analyzer::analyze(std::unique_ptr<ast::print_statement>& node) {
+  analyze(node->expression); // Ensures variables inside print(a) actually exist!
+}
+
 void Semantic_Analyzer::analyze(std::unique_ptr<ast::while_statement>& node) {
   Type condType = analyze(node->condition);
   if (condType != Type::Boolean) {
-    throw CompileError("Semantic",
-                       std::format("condition in 'while' loop must be a boolean, got '{}'",
-                                   returnTypeString(condType)));
+    throw CompileError(
+        "Semantic", std::format("condition in 'while' loop must be a boolean, got '{}'", returnTypeString(condType)));
   }
 
   table.enterScope();
@@ -119,6 +130,8 @@ Type Semantic_Analyzer::analyze(std::unique_ptr<ast::expr>& node) {
           return Type::Double;
         } else if constexpr (std::is_same_v<T, ast::string_val>) {
           return Type::String;
+        } else if constexpr (std::is_same_v<T, ast::bool_val>) {
+          return Type::Boolean;
         } else if constexpr (std::is_same_v<T, ast::identifier_val>) {
           symbol* sym = table.lookUp(value.name);
           if (sym == nullptr) {
@@ -148,8 +161,8 @@ Type Semantic_Analyzer::analyzeBinaryOperator(Type left, const token& oper, Type
         return Type::String;
 
       throw CompileError("Semantic", oper.loc,
-                         std::format("operator '+' cannot be applied to types '{}' and '{}'",
-                                     returnTypeString(left), returnTypeString(right)));
+                         std::format("operator '+' cannot be applied to types '{}' and '{}'", returnTypeString(left),
+                                     returnTypeString(right)));
 
     case tokenType::STAR:
     case tokenType::MINUS:
@@ -160,8 +173,8 @@ Type Semantic_Analyzer::analyzeBinaryOperator(Type left, const token& oper, Type
         return Type::Double;
 
       throw CompileError("Semantic", oper.loc,
-                         std::format("operator '{}' cannot be applied to types '{}' and '{}'",
-                                     oper.value, returnTypeString(left), returnTypeString(right)));
+                         std::format("operator '{}' cannot be applied to types '{}' and '{}'", oper.value,
+                                     returnTypeString(left), returnTypeString(right)));
 
     // Bitwise
     case tokenType::BIT_AND:
@@ -171,8 +184,8 @@ Type Semantic_Analyzer::analyzeBinaryOperator(Type left, const token& oper, Type
         return Type::Int;
 
       throw CompileError("Semantic", oper.loc,
-                         std::format("bitwise operator '{}' requires integer operands, got '{}' and '{}'",
-                                     oper.value, returnTypeString(left), returnTypeString(right)));
+                         std::format("bitwise operator '{}' requires integer operands, got '{}' and '{}'", oper.value,
+                                     returnTypeString(left), returnTypeString(right)));
 
     // Relational comparisons
     case tokenType::LESSER:
@@ -204,28 +217,25 @@ Type Semantic_Analyzer::analyzeBinaryOperator(Type left, const token& oper, Type
         return Type::Boolean;
 
       throw CompileError("Semantic", oper.loc,
-                         std::format("logical operator '{}' requires boolean operands, got '{}' and '{}'",
-                                     oper.value, returnTypeString(left), returnTypeString(right)));
+                         std::format("logical operator '{}' requires boolean operands, got '{}' and '{}'", oper.value,
+                                     returnTypeString(left), returnTypeString(right)));
 
     default:
-      throw CompileError("Semantic", oper.loc,
-                         std::format("unsupported binary operator '{}'", oper.value));
+      throw CompileError("Semantic", oper.loc, std::format("unsupported binary operator '{}'", oper.value));
   }
 }
 
 void Semantic_Analyzer::analyze(ast::assignment& node) {
   symbol* identifier = Semantic_Analyzer::table.lookUp(node.identifier->name);
   if (identifier == nullptr) {
-    throw CompileError("Semantic",
-                       std::format("cannot assign to undeclared variable '{}'", node.identifier->name));
+    throw CompileError("Semantic", std::format("cannot assign to undeclared variable '{}'", node.identifier->name));
   }
 
   Type type = analyze(node.expression);
   if (type != identifier->type && !(type == Type::Int && identifier->type == Type::Double)) {
     throw CompileError("Semantic",
                        std::format("type mismatch: cannot assign value of type '{}' to variable '{}' of type '{}'",
-                                   returnTypeString(type), node.identifier->name,
-                                   returnTypeString(identifier->type)));
+                                   returnTypeString(type), node.identifier->name, returnTypeString(identifier->type)));
   }
 }
 
@@ -234,14 +244,13 @@ void Semantic_Analyzer::analyze(ast::declaration& node) {
   if (!doesTypeMatch(node.type, type)) {
     throw CompileError("Semantic",
                        std::format("type mismatch in declaration of '{}': declared as '{}', initialized with '{}'",
-                                   node.identifier->name, returnTokenTypeString(node.type),
-                                   returnTypeString(type)));
+                                   node.identifier->name, returnTokenTypeString(node.type), returnTypeString(type)));
   }
 
-  if (!table.declare(node.identifier->name, {node.type == tokenType::DOUBLE && type == Type::Int ? Type::Double : type})) {
+  if (!table.declare(node.identifier->name,
+                     {node.type == tokenType::DOUBLE && type == Type::Int ? Type::Double : type})) {
     throw CompileError("Semantic",
-                       std::format("redeclaration of variable '{}' in the same scope",
-                                   node.identifier->name));
+                       std::format("redeclaration of variable '{}' in the same scope", node.identifier->name));
   }
 }
 

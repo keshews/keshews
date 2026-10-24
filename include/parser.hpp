@@ -18,6 +18,7 @@ private:
   bool isLiteral(token tok);
   bool isOperator(token tok);
   std::unique_ptr<ast::expr> createOperandNode(token tok);
+  std::unique_ptr<ast::print_statement> parsePrintStatement();
   ast::declaration parseDeclarationExpression();
 
   std::unordered_map<tokenType, int> binding_power = {

@@ -15,6 +15,10 @@ ast::string_val ast::createStringNode(std::string val) {
   return string_val{val};
 }
 
+ast::bool_val ast::createBoolNode(bool val) {
+  return bool_val{val};
+}
+
 ast::identifier_val ast::createIdentifierNode(std::string val) {
   return identifier_val{val};
 }
@@ -67,6 +71,12 @@ std::unique_ptr<ast::for_statement> ast::createForStatementNode(init_type type, 
 std::unique_ptr<ast::while_statement> ast::createWhileStatementNode(std::unique_ptr<expr> condition,
                                                                     std::unique_ptr<container> body) {
   return std::make_unique<while_statement>(while_statement{std::move(condition), std::move(body)});
+}
+
+// print statement
+
+std::unique_ptr<ast::print_statement> ast::createPrintStatement(std::unique_ptr<expr> expr) {
+  return std::make_unique<print_statement>(print_statement{std::move(expr)});
 }
 
 // container

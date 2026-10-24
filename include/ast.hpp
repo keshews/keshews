@@ -29,6 +29,10 @@ typedef struct {
 } identifier_val;
 
 typedef struct {
+  bool val;
+} bool_val;
+
+typedef struct {
   std::unique_ptr<expr> left_val;
   token oper;
   std::unique_ptr<expr> right_val;
@@ -40,7 +44,7 @@ typedef struct {
   token right_par;
 } group_expr;
 
-using ExprType = std::variant<int_val, double_val, string_val, binary_expression, group_expr, identifier_val>;
+using ExprType = std::variant<int_val, double_val, string_val, bool_val, binary_expression, group_expr, identifier_val>;
 
 struct expr {
   ExprType val;
@@ -63,6 +67,7 @@ identifier_val createIdentifierNode(std::string val);
 int_val createIntNode(std::string val);
 double_val createDoubleNode(std::string val);
 string_val createStringNode(std::string val);
+bool_val createBoolNode(bool val);
 group_expr createGroupExprNode(token left_par, std::unique_ptr<expr> expression, token right_par);
 std::unique_ptr<expr> createExprNode(ExprType val);
 std::unique_ptr<expr> createBinaryExprNode(std::unique_ptr<expr> left_val, token oper, std::unique_ptr<expr> right_val);
@@ -123,8 +128,14 @@ std::unique_ptr<for_statement> createForStatementNode(init_type type, std::uniqu
 std::unique_ptr<while_statement> createWhileStatementNode(std::unique_ptr<expr> condition,
                                                           std::unique_ptr<container> body);
 
+struct print_statement {
+  std::unique_ptr<expr> expression;
+};
+
+std::unique_ptr<print_statement> createPrintStatement(std::unique_ptr<expr> expr);
+
 using statements = std::variant<std::unique_ptr<expr>, std::unique_ptr<if_statement>, std::unique_ptr<for_statement>,
-                                std::unique_ptr<while_statement>, assignment, declaration>;
+                                std::unique_ptr<while_statement>, assignment, declaration, std::unique_ptr<print_statement>>;
 
 struct container {
   std::vector<statements> stmts;

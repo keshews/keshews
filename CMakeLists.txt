@@ -69,6 +69,8 @@ endif()
 
 add_executable(keshews
     src/main.cpp
+    src/lexer.cpp
+    src/parser.cpp
     src/ast.cpp
     src/tac.cpp
     src/semantic_analyzer.cpp

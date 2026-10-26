@@ -1,14 +1,11 @@
-int a = 10
+int a = 20
 int b = 15
-int c = 0
-int d = 9
-int q = 10
-int r = 9 - q
 
-if (a>b) {
+if(a>b) {
     print(b)
-} elif (c==d) {
-    print(c)
-} else {
-    print(q)
+} elif(a==b) {
+    print("equal")
+}
+else {
+    print(a)
 }

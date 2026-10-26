@@ -1,0 +1,11 @@
+int a = 0
+int b = 1
+print(a)
+print(b)
+int n = 10
+for(int i=2; i<n;i=i+1){
+    print(a+b)
+    int k = b
+     b = a+b
+    a = k
+}

@@ -75,7 +75,7 @@ sudo pacman -S --needed base-devel cmake clang llvm
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-username/keshews.git
+   git clone https://github.com/keshews/keshews.git
    cd keshews
    ```
 
